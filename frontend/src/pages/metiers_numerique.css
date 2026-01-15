@@ -1,0 +1,67 @@
+.metier-main {
+  max-width: 1200px;       
+  width: 90%;              
+  margin: 2rem auto;      
+  padding: 3rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;     
+  text-align: center;      
+  font-size: 1rem;       
+}
+
+.metier-main h1 {
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+  font-size: 2.25rem;
+}
+
+.metier-main h2 {
+  margin-top: 2rem;
+  color: #1e40af;
+  font-size: 1.5rem;
+}
+
+.metier-main h3 {
+  margin-top: 1rem;
+  color: #1e3a8a;
+  font-size: 1rem;
+}
+
+.metier-main p,
+.metier-main li {
+  line-height: 1.8;
+  color: #374151;
+  font-size: 1rem;       /* légèrement plus grand que normal */
+}
+
+.metier-main ul {
+  margin-left: 0;          /* comme le texte est centré, on enlève l'indent */
+  padding-left: 0;
+  list-style-position: inside; /* puces à l'intérieur du bloc centré */
+}
+
+/* Responsive pour petits écrans */
+@media (max-width: 768px) {
+  .metier-main {
+    width: 95%;
+    padding: 2rem;
+    font-size: 1rem;       /* réduit un peu sur mobile */
+  }
+
+  .metier-main h1 {
+    font-size: 2rem;
+  }
+
+  .metier-main h2 {
+    font-size: 1.5rem;
+  }
+
+  .metier-main h3 {
+    font-size: 1.2rem;
+  }
+}

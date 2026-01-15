@@ -1,0 +1,30 @@
+/* Supprime les marges/paddings par défaut et définit box-sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Définit une police globale et couleur de fond */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Liens par défaut */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Listes par défaut */
+ul, ol {
+  list-style: none;
+}
+
+/* Images responsive */
+img {
+  max-width: 100%;
+  display: block;
+}

@@ -1,0 +1,144 @@
+/* Admin.css */
+
+.header-nav .nav-link {
+margin-right: 3px;
+}
+
+/* Conteneur principal */
+.main-content {
+  max-width: 1350px;       
+  margin: 2rem auto; 
+  padding: 1rem;
+  background-color: #f9fafb;
+  flex: 1;
+  min-height: calc(100vh - 120px);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow-x: auto;
+}
+
+/* Titre principal */
+.main-content h1 {
+  font-size: 2rem;
+  color: #00acb5;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Table */
+table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* En-tête */
+thead {
+  background-color: #00acb5;
+  color: #fff;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Hover sur les lignes */
+tbody tr:hover {
+  background-color: #f0f4ff;
+}
+
+/* Boutons action */
+button {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-approve {
+  background-color: #10b981;
+  color: #fff;
+  margin-right: 0.5rem;
+  margin-bottom: 3px;
+}
+
+.btn-approve:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.btn-reject {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.btn-reject:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+/* Texte pour statuts approuvé/rejeté */
+td span {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Message "Aucun utilisateur trouvé" */
+tbody tr td[colspan] {
+  text-align: center;
+  font-style: italic;
+  color: #6b7280;
+  padding: 2rem 0;
+}
+
+/* Conteneur boutons pour table responsive */
+button + button {
+  margin-left: 0.5rem;
+}
+
+/* Responsive table simple */
+@media (max-width: 900px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead tr {
+    display: none;
+  }
+
+  tbody tr {
+    margin-bottom: 1rem;
+    background-color: #fff;
+    padding: 0.75rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #1e3a8a;
+  }
+
+  td span {
+    font-weight: normal;
+  }
+}
