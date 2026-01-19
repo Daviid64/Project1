@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/tokenUtils.js";
+import { sendPasswordResetEmail } from "../utils/email.js";
+import { validateBody, registerSchema, loginSchema, resetPasswordSchema } from "../middleware/validation.js";
 
 const router = express.Router();
 
@@ -59,7 +61,7 @@ router.get("/me", verifyToken, async (req, res) => {
 /* ===========================
    REGISTER
 =========================== */
-router.post("/register", async (req, res) => {
+router.post("/register", validateBody(registerSchema), async (req, res) => {
   try {
     const { first_name, last_name, email, password, confirmPassword, agency_id, role } = req.body;
 
@@ -121,7 +123,7 @@ router.post("/register", async (req, res) => {
 /* ===========================
    LOGIN
 =========================== */
-router.post("/login", async (req, res) => {
+router.post("/login", validateBody(loginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -240,7 +242,7 @@ router.post("/forgot-password", async (req, res) => {
     );
 
     // Envoyer l'email (à implémenter avec nodemailer)
-    // await sendPasswordResetEmail(user.email, resetToken);
+    await sendPasswordResetEmail(user.email, resetToken);
 
     res.json({ 
       success: true, 

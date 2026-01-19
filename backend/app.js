@@ -5,8 +5,9 @@ import cors from "cors";
 import UserRoute from './routes/UserRoute.js';
 import adminRoutes from './routes/adminRoutes.js';
 import authRoutes from './routes/authRoute.js';
-import { limiter} from './middleware/rateLimiters.js';
+import { limiter } from './middleware/rateLimiters.js';
 import cookieParser from 'cookie-parser';
+import Joi from 'joi'; // ✅ Ajout de Joi pour validation des entrées
 
 // ⚡ Charger les variables d'environnement
 dotenv.config();
@@ -14,13 +15,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ⚡ Trust proxy
+// ⚡ Trust proxy (utile derrière un proxy type Nginx ou Render)
 app.set('trust proxy', 1);
 
 // ⚡ 1. Cookie parser
 app.use(cookieParser());
 
-// ⚡ 2. CORS configuration
+// ⚡ 2. CORS configuration sécurisée
 const corsOptions = {
   origin: function(origin, callback) {
     const allowedOrigins = [
@@ -29,17 +30,13 @@ const corsOptions = {
       "https://projet-stage-afec.onrender.com"
     ];
     
-    // Autoriser les requêtes sans origin
     if (!origin) {
-      console.log("Requête sans origin autorisée");
-      return callback(null, true);
+      return callback(null, true); // autoriser les requêtes depuis Postman / outils internes
     }
     
     if (allowedOrigins.includes(origin)) {
-      console.log(`CORS autorisé pour: ${origin}`);
-      callback(null, true);
+      return callback(null, true);
     } else {
-      console.warn(`CORS bloqué pour: ${origin}`);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
@@ -47,68 +44,83 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   exposedHeaders: ["Set-Cookie"],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
 };
-
 app.use(cors(corsOptions));
 
 // ⚡ 3. Body parsers
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // ✅ limitation taille JSON pour éviter flood/malware
 app.use(express.urlencoded({ extended: true }));
 
-// ⚡ 4. Helmet
+// ⚡ 4. Helmet avec sécurité renforcée
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  referrerPolicy: { policy: "no-referrer" },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "http://localhost:5173"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  }
 }));
 
-// ⚡ 5. Rate limiters
-app.use("/api/users", limiter);
+// ⚡ 5. Rate limiter
+// ✅ Appliqué sur toutes les routes sensibles
+app.use("/users", limiter);
+app.use("/admin", limiter);
+app.use("/auth", limiter);
 
-// ⚡ 6. Middleware de logging
+// ⚡ 6. Middleware de logging simple
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - Origin: ${req.get('origin') || 'none'}`);
   next();
 });
 
-// ⚡ 7. Routes
+// ⚡ 7. Validation des entrées avec Joi
+// Exemple : middleware pour valider un body JSON pour création utilisateur
+export const validateBody = (schema) => (req, res, next) => {
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ success: false, message: error.details[0].message });
+  }
+  next();
+};
+
+// Exemples de schemas Joi
+export const createUserSchema = Joi.object({
+  name: Joi.string().min(3).max(30).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+// ⚡ 8. Routes principales
 app.use("/users", UserRoute);
 app.use("/admin", adminRoutes);
 app.use("/auth", authRoutes);
 
-// Routes utilitaires
+// ⚡ Routes utilitaires pour tests et health check
 app.get('/api/verify/:token', (req, res) => {
   const { token } = req.params;
-  console.log('Token reçu :', token);
   res.json({ success: true, token });
 });
 
 app.get('/api/test-cookie', (req, res) => {
-  console.log('Test cookies:', req.cookies);
-  res.json({ 
-    success: true,
-    cookies: req.cookies,
-    message: 'Test des cookies réussi' 
-  });
+  res.json({ success: true, cookies: req.cookies, message: 'Test des cookies réussi' });
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Backend opérationnel',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ success: true, message: 'Backend opérationnel', timestamp: new Date().toISOString() });
 });
 
-// ⚡ 404
+// ⚡ 404 - Route non trouvée
 app.use((req, res) => {
-  console.warn(`404 - Route non trouvée: ${req.method} ${req.path}`);
-  res.status(404).json({ 
-    success: false, 
-    message: "Route non trouvée",
-    path: req.path
-  });
+  res.status(404).json({ success: false, message: "Route non trouvée", path: req.path });
 });
 
 // ⚡ Gestion des erreurs
@@ -117,25 +129,19 @@ app.use((err, req, res, next) => {
   
   // Erreur CORS
   if (err.message && err.message.includes('CORS')) {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Origine non autorisée' 
-    });
+    return res.status(403).json({ success: false, message: 'Origine non autorisée' });
   }
   
-  res.status(err.status || 500).json({ 
-    success: false, 
-    message: err.message || "Erreur interne du serveur" 
-  });
+  res.status(err.status || 500).json({ success: false, message: err.message || "Erreur interne du serveur" });
 });
 
+// ⚡ Démarrage serveur
 app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════╗
 ║  Serveur démarré avec succès              ║
 ║  URL: http://localhost:${PORT}              ║
-║  Env: ${process.env.NODE_ENV || 'development'}                      ║
-║  CORS: http://localhost:5173              ║
+║  Env: ${process.env.NODE_ENV || 'development'} ║
 ╚══════════════════════════════════════════════╝
   `);
 });
