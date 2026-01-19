@@ -9,53 +9,52 @@ export default function ForgotPasswordPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();     // Empêche le rechargement de la page
-        setMessage("");     // Réinitialise le message visible avant la nouvelle requête
-    
+        setMessage("");         // Réinitialise le message avant la nouvelle requête
 
-    try {
-        const response = await API.post('/auth/forgotPassword', {
-        email,    
-        });
+        try {
+            const response = await API.post('/auth/forgot-password', { email });
 
-        if (response.data.success) {
-            setMessage(response.data.message);
+            if (response?.success) {
+                setMessage(response.message); // Affiche le message du serveur
+            } else {
+                setMessage("Impossible d'envoyer le lien");
+            }
+        } catch (err) {
+            console.error("Erreur forgot password", err);
+            if (err.response?.data?.message) {
+                setMessage(err.response?.data?.message);
+            } else {
+                setMessage("Erreur de connexion au serveur");
+            }
         }
-    } catch (err) {
-        console.error("Erreur forgot password", err);
-        if (err.response?.data?.message) {
-            setMessage(err.response?.data?.message);
-        } else {
-            setMessage("Erreur de connexion au serveur");
-        }
-    }
-}
+    };
 
-return (
-    <div className="login-container">
-        <div className="forgot-password-form">
-        <form onSubmit={handleSubmit}>
-        <h2 className="login-title">Mot de passe oublié</h2> 
+    return (
+        <div className="login-container">
+            <div className="forgot-password-form">
+                <form onSubmit={handleSubmit}>
+                    <h2 className="login-title">Mot de passe oublié</h2> 
 
-        <input 
-        type="email" 
-        placeholder="Adresse e-mail"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="login-input"
-        required
-        />
+                    <input 
+                        type="email" 
+                        placeholder="Adresse e-mail"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="login-input"
+                        required
+                    />
 
-        <button type="submit" className="login-button">
-            Envoyer le lien
-        </button>
+                    <button type="submit" className="login-button">
+                        Envoyer le lien
+                    </button>
 
-        {message && <p className="login-message">{message}</p>}
-        </form>
+                    {message && <p className="login-message">{message}</p>}
+                </form>
 
-        <div className="forgot-password">
-            <Link to="/login">Retour à la page de connexion</Link>
+                <div className="forgot-password">
+                    <Link to="/login">Retour à la page de connexion</Link>
+                </div>
+            </div>   
         </div>
-     </div>   
-    </div>
-);
+    );
 }

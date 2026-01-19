@@ -7,6 +7,7 @@ import PolitiqueConfidentialite from "./components/PolitiqueConfidentialite.jsx"
 import Acceuil from "./pages/Home.jsx";
 import ExplorationMetiers from "./pages/ExplorationMetiers.jsx";
 import MetierPage from "./pages/metiers.jsx";
+import CoursePage from "./pages/Course.jsx";
 import LoginPage from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
 import ForgotPasswordPage from "./components/forgotPassword.jsx";
@@ -47,6 +48,7 @@ function App() {
         {/* Routes protégées */}
         <Route path="/Home" element={<ProtectedRoute><Acceuil /></ProtectedRoute>} />
         <Route path="/exploration" element={<ProtectedRoute><ExplorationMetiers /></ProtectedRoute>} />
+        <Route path="/course" element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
         {/* Routes admin */}
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         {/* Connexion/inscription */}

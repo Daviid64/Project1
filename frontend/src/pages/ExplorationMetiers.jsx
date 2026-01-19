@@ -43,6 +43,7 @@ function ExplorationMetier() {
       <header className="header">
         <nav className="header-nav">
           <Link to="/Home" className="nav-link">Accueil</Link>
+          <Link to="/course" className="nav-link">Cours</Link>
         </nav>
       </header>
 

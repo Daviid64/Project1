@@ -42,6 +42,9 @@ function Acceuil() {
           <Link to="/exploration" className="nav-link">
             Exploration des Métiers
           </Link>
+          <Link to="/course" className="nav-link">
+          Cours
+          </Link>
           {user && (
             <button onClick={handleLogout} className="btn-logout">
               Déconnexion
@@ -63,11 +66,6 @@ function Acceuil() {
           et construisez votre parcours avec l’AFEC.
         </p>
 
-        <div className="button-container">
-          <Link to="/exploration" className="explore-button">
-            Exploration Métiers
-          </Link>
-        </div>
       </main>
 
       <footer className="footer">
